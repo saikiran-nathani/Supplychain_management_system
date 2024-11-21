@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Active Contracts </title>
+    <link rel="stylesheet" href="active_contracts.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+   </head>
+<body>
+  <div class="sidebar">
+    <div class="logo-details">
+     <img src="images/Logichain_logo.svg" alt="Logichain" alt="Logichain">
+    </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Dashboard.html" class="active">
+            <i class='bx bx-grid-alt' ></i>
+            <span class="links_name">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="contracts.html">
+            <i class='bx bx-box' ></i>
+            <span class="links_name">Contracts</span>
+          </a>
+        </li>
+        <li>
+          <a href="settings.html">
+            <i class='bx bx-cog' ></i>
+            <span class="links_name">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="contactus.html">
+            <i class='bx bx-user' ></i>
+            <span class="links_name">Contact Us</span>
+          </a>
+        </li>
+        <li>
+          <a href="feedback.html">
+            <i class='bx bx-message' ></i>
+            <span class="links_name">Feedback</span>
+          </a>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+        
+      </ul>
+  </div>
+  <section class="home-section">
+    <nav>
+      <div class="sidebar-button">
+        <i class='bx bx-menu'></i>
+        <span class="dashboard">Active Contracts</span>
+      </div>
+      <div class="search-box">
+        <input type="text" placeholder="Search...">
+        <i class='bx bx-search' ></i>
+      </div>
+      <div class="profile-details">
+      
+        <span class="admin_name" id="username"></span>
+      </div>
+    </nav>
+
+       
+        
+       
+       
+      </div>
+
+      <div class="sales-boxes">
+        <div class="recent-sales box">
+          <div class="title">Active Contracts</div>
+          <div class="sales-details">
+            <ul class="details">
+              <li class="topic"></li>
+            </ul>
+            <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+          <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+          <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+      </div>
+    </div>
+
+    <div class="list" >
+        <h2>Active Contracts</h2>
+        <ul ><li id="active_contracts">
+        </li>
+        <li>
+                <span></span>
+            </label>
+        </li>
+        <li>
+            
+                <p></p>
+                <span></span>
+            </label>
+        </li>
+        <li>
+            
+                <p></p>
+                <span></span>
+            </label>
+        </li>
+        <li>
+           
+                <p></p>
+                <span></span>
+            </label>
+        </li>
+    </ul>
+
+    </div>
+  
+  </section>
+
+  <script>
+
+window.addEventListener("load", async function(){
+  await fetch("./build/contracts/userData.json")
+              .then((response) => response.json())
+              .then((data) => {
+                userData = data;
+              });
+
+            web3 = new Web3(window.ethereum); 
+            await window.ethereum.enable();
+            var accounts = await web3.eth.getAccounts();
+            let contract = new web3.eth.Contract(
+              userData.abi,
+              "0xb958766e6C29bD233B58e37557103fAfCD021330"
+            );
+
+            var contracts = await contract.methods
+              .getContractAddress(accounts[0])
+              .call();
+
+              contracts.forEach((item, num) => {
+              let a = document.createElement("a");
+              a.href = "rename_contracts.html?address=" + item;
+              a.innerText = "Contract " + (num + 1);
+              document.getElementById("active_contracts").appendChild(a);
+              document
+                .getElementById("active_contracts")
+                .appendChild(document.createElement("br"));
+              document
+                .getElementById("active_contracts")
+                .appendChild(document.createElement("br"));
+            });
+})
+
+
+
+
+  let username = document.getElementById('username');
+  username.innerText = localStorage.getItem('name');
+   let sidebar = document.querySelector(".sidebar");
+let sidebarBtn = document.querySelector(".sidebarBtn");
+sidebarBtn.onclick = function() {
+  sidebar.classList.toggle("active");
+  if(sidebar.classList.contains("active")){
+  sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+}else
+  sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+}
+ </script>
+</body>
+</html>

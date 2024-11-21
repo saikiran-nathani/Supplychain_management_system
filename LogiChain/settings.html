@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Settings </title>
+    <link rel="stylesheet" href="settings_style.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="sidebar">
+    <div class="logo-details">
+     <img src="images/Logichain_logo.svg" alt="Logichain" alt="Logichain">
+      
+    </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Dashboard.html" class="active">
+            <i class='bx bx-grid-alt' ></i>
+            <span class="links_name">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="contracts.html">
+            <i class='bx bx-box' ></i>
+            <span class="links_name">Contracts</span>
+          </a>
+        </li>
+        <li>
+          <a href="settings.html">
+            <i class='bx bx-cog' ></i>
+            <span class="links_name">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="contactus.html">
+            <i class='bx bx-user' ></i>
+            <span class="links_name">Contact Us</span>
+          </a>
+        </li>
+        <li>
+          <a href="feedback.html">
+            <i class='bx bx-message' ></i>
+            <span class="links_name">Feedback</span>
+          </a>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+      
+      </ul>
+  </div>
+  <section class="home-section">
+    <nav>
+      <div class="sidebar-button">
+        <i class='bx bx-menu'></i>
+        <span class="dashboard">Settings</span>
+      </div>
+      <div class="search-box">
+        <input type="text" placeholder="Search...">
+        <i class='bx bx-search' ></i>
+      </div>
+      <div class="profile-details">
+      
+        <span class="admin_name" id="username"></span>
+      </div>
+    </nav>
+
+       
+        
+       
+       
+      </div>
+
+      <div class="sales-boxes">
+        <div class="recent-sales box">
+          <div class="title">Active Contracts</div>
+          <div class="sales-details">
+            <ul class="details">
+              <li class="topic"></li>
+            </ul>
+            <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+          <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+          <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+      </div>
+    </div>
+  
+  </section>
+
+  <section class="account-details">
+    <div class="container">
+        <div class="title">Account</div>
+        <div class="content">
+          <form action="#">
+            <div class="user-details">
+              <div class="input-box">
+                <span class="details">Full Name</span>
+                <input type="text" placeholder="Enter your name" required id="name">
+              </div>
+              <div class="input-box">
+                <span class="details">Phone Number</span>
+                <input type="text" placeholder="Enter your Phone Number" required id="mobile_no">
+              </div>
+              
+              <div class="input-box">
+                <span class="details">Wallet Address</span>
+                <span id="wallet_addr"></span>
+              </div>
+            </div>
+            
+            <div class="button">
+              <button type="button" class="save_btn" onclick="save()">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  </section>
+
+  <script>
+    let name = document.getElementById('name');
+    let mobile_no = document.getElementById('mobile_no');
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const status = urlParams.get('status');
+    console.log(status);
+
+    if(status === "create"){
+      alert("Enter name and mobile number to continue");
+    }
+
+    var web3;
+    var accounts;
+
+    window.addEventListener("load", async function() {
+      if(typeof window.ethereum !== "undefined"){
+        web3 = new Web3(window.ethereum);
+        try{
+          await window.ethereum.enable();
+          accounts = await web3.eth.getAccounts();
+          console.log(accounts);
+
+          var wallet_addr = document.getElementById('wallet_addr');
+          wallet_addr.innerText = accounts[0];
+
+        }catch(err){
+          console.log(err);
+        }
+      }
+    });
+
+    async function save(){
+      await fetch('./build/contracts/userData.json')
+      .then(response => response.json())
+      .then(data => {
+        userData = data;
+      });
+      
+      console.log(userData);
+      let contract = new web3.eth.Contract(userData.abi, "0xb958766e6C29bD233B58e37557103fAfCD021330");
+
+      await contract.methods.createUser(accounts[0], name.value, mobile_no.value).send({
+        from: accounts[0]
+      }).on("receipt", function(receipt) {
+        alert('Account successfully created');
+        address = receipt.address;
+      })
+      .on("error", function(error) {
+          alert(error);
+      });
+
+      localStorage.setItem('name', name.value);
+      localStorage.setItem('mobile_no', mobile_no.value);
+      window.location.href = "Dashboard.html";
+    }
+
+    name.value = localStorage.getItem('name');
+    mobile_no.value = localStorage.getItem('mobile_no');
+    
+
+   let sidebar = document.querySelector(".sidebar");
+let sidebarBtn = document.querySelector(".sidebarBtn");
+sidebarBtn.onclick = function() {
+  sidebar.classList.toggle("active");
+  if(sidebar.classList.contains("active")){
+  sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+}else
+  sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+}
+ </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title> Contracts </title>
+    <link rel="stylesheet" href="contracts_style.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="./build/contracts/baseContract.json"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="sidebar">
+    <div class="logo-details">
+     <img src="images/Logichain_logo.svg" alt="Logichain" alt="Logichain">
+      
+    </div>
+      <ul class="nav-links">
+        <li>
+          <a href="Dashboard.html" class="active">
+            <i class='bx bx-grid-alt' ></i>
+            <span class="links_name">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="contracts.html">
+            <i class='bx bx-box' ></i>
+            <span class="links_name">Contracts</span>
+          </a>
+        </li>
+        <li>
+          <a href="settings.html">
+            <i class='bx bx-cog' ></i>
+            <span class="links_name">Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="contactus.html">
+            <i class='bx bx-user' ></i>
+            <span class="links_name">Contact Us</span>
+          </a>
+        </li>
+        <li>
+          <a href="feedback.html">
+            <i class='bx bx-message' ></i>
+            <span class="links_name">Feedback</span>
+          </a>
+        </li>
+        <li>
+        </li>
+        <li>
+        </li>
+      </ul>
+  </div>
+  <section class="home-section">
+    <nav>
+            <ul>
+               <li>
+                  <a href="#">Contracts
+                  <i class="fas fa-caret-down"></i>
+                  </a>
+                  <ul>
+                     <li><a href="active_contracts.html">Active</a></li>
+                     <li><a href="past_contracts.html">Past</a></li>
+                     <li><a onclick="createContract()">Create New</a></li>
+                  </ul>
+               </li>
+               
+            </ul>
+      <div class="profile-details">
+      
+        <span class="admin_name" id="username">Ritvik ojha</span>
+      </div>
+    </nav>
+
+       
+        
+       
+       
+      </div>
+
+      <div class="sales-boxes">
+        <div class="recent-sales box">
+          <div class="title">Active Contracts</div>
+          <div class="sales-details">
+            <ul class="details">
+              <li class="topic"></li>
+            </ul>
+            <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+          <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+          <ul class="details">
+            <li class="topic"></li>
+            
+          </ul>
+      </div>
+    </div>
+  
+  </section>
+
+
+
+  <script>
+
+    async function createContract(){
+
+      if (typeof window.ethereum !== 'undefined') {
+          web3 = new Web3(window.ethereum);      
+        try {
+          await window.ethereum.enable();
+          var accounts = await web3.eth.getAccounts();
+          web3.eth.getBalance(accounts[0]).then(console.log);
+          console.log(web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether'));
+
+          var baseContract;
+          await fetch('./build/contracts/baseContract.json')
+            .then(response => response.json())
+            .then(data => {
+                baseContract = data;
+            })
+          console.log(baseContract);
+
+          var contract = new web3.eth.Contract(baseContract.abi);
+
+          var contract_address;
+          contract = await contract.deploy({
+              data: baseContract.bytecode,
+              arguments: [localStorage.getItem('name'), localStorage.getItem('mobile_no'), accounts[0]]
+            })
+            .send({
+              from: accounts[0]
+            }).on("receipt", function(receipt) {
+              $("#txStatus").text("Successfully created " + name + "!");
+              alert('Contract created successfully at ' + receipt.address);
+              address = receipt.address;
+            })
+            .on("error", function(error) {
+                alert(error);
+              $("#txStatus").text(error);
+            });
+
+            await fetch('./build/contracts/userData.json')
+              .then(response => response.json())
+              .then(data => {
+                userData = data;
+              });
+              
+            console.log(userData);    
+
+          return true
+        } catch(e) {
+          console.log(e);
+          return false
+        }
+      }
+    }
+
+    let username_field = document.getElementById("username");
+    username_field.innerText = localStorage.getItem('name');
+
+   let sidebar = document.querySelector(".sidebar");
+let sidebarBtn = document.querySelector(".sidebarBtn");
+sidebarBtn.onclick = function() {
+  sidebar.classList.toggle("active");
+  if(sidebar.classList.contains("active")){
+  sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+}else
+  sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+}
+ </script>
+</body>
+</html>

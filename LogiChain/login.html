@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <title>Logichain Login</title>
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link href="login_style.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="build/contracts/userData.json"></script>
+  </head>
+
+  <body class="flex w-screen h-screen justify-center items-center">
+    <div class="flex-col space-y-2 justify-center items-center">
+      <button
+        id="loginButton"
+        onclick=""
+        class="mx-auto rounded-md p-2 bg-purple-500 text-white"
+      >
+        Login with MetaMask
+      </button>
+      <p id="userWallet" class="text-lg text-gray-600 my-2"></p>
+      <img src="images/Logichain_logo.svg" alt="" width="500px" />
+    </div>
+
+
+        <footer>
+          <div class="bottom">
+            <center>
+              <span class="credit"
+                >Created By
+                <a href="">sai kiran</a>
+              
+              </span>
+              <span class="far fa-copyright"></span
+              ><span>| 2022 | All rights reserved.</span>
+            </center>
+          </div>
+        </footer>
+
+        <script>
+          window.userWalletAddress = null;
+          const loginButton = document.getElementById("loginButton");
+          const userWallet = document.getElementById("userWallet");
+
+          function toggleButton() {
+            if (!window.ethereum) {
+              loginButton.innerText = "MetaMask is not installed";
+              loginButton.classList.remove("bg-purple-500", "text-white");
+              loginButton.classList.add(
+                "bg-gray-500",
+                "text-gray-100",
+                "cursor-not-allowed"
+              );
+              return false;
+            }
+
+            loginButton.addEventListener("click", loginWithMetaMask);
+          }
+
+          async function loginWithMetaMask() {
+            web3 = new Web3(window.ethereum);
+
+          
+            try{
+
+              await window.ethereum.enable();
+              var accounts = await web3.eth.getAccounts();
+              window.userWalletAddress = accounts[0];
+
+               var userData;
+               await fetch('./build/contracts/userData.json')
+               .then(response => response.json())
+               .then(data => {
+                  userData = data;
+                });
+               
+               console.log(userData);
+               var web3js = new Web3("https://speedy-nodes-nyc.moralis.io/2121a9e387697a9756013326/polygon/mumbai");
+               let contract = new web3js.eth.Contract(userData.abi, "0xb958766e6C29bD233B58e37557103fAfCD021330");
+
+               let val = await contract.methods.findUser(accounts[0]).call();
+               localStorage.setItem('account', accounts[0]);
+               localStorage.setItem('name', val[1]);
+               localStorage.setItem('mobile_no', val[2]);
+               if(val[0] === "0"){
+                  window.location.href="settings.html?status=create";
+               }else{
+                window.location.href="Dashboard.html";
+               }
+               console.log(val);
+              
+               userWallet.innerText = window.userWalletAddress;
+              
+              
+            }catch(err){
+              console.log(err);
+            }
+
+
+            loginButton.removeEventListener("click", loginWithMetaMask);
+            setTimeout(() => {
+              loginButton.addEventListener("click", signOutOfMetaMask);
+            }, 200);
+          }
+
+          function signOutOfMetaMask() {
+            window.userWalletAddress = null;
+            userWallet.innerText = "";
+            loginButton.innerText = "Sign in with MetaMask";
+
+            loginButton.removeEventListener("click", signOutOfMetaMask);
+            setTimeout(() => {
+              loginButton.addEventListener("click", loginWithMetaMask);
+            }, 200);
+          }
+
+          window.addEventListener("DOMContentLoaded", () => {
+            toggleButton();
+          });
+        </script>
+      </body>
+    </html>
+  </body>
+</html>
